@@ -53,7 +53,6 @@ export const PageLogo = styled.div `
     margin-top: -30vh;
     margin-bottom: 10vh;
 
-    
 `
 export const LogoImg = styled.img`
     width: 100%;
@@ -67,11 +66,14 @@ export const LogoImg = styled.img`
         margin-top: 20vh;
     }
 
-    @media ${breakpoints.sm}{
-        margin-top: 20vh;
-    }
-
     @media ${breakpoints.md}{
         margin-top: 20vh;
     }
+
+    @media ${breakpoints.sm}{
+        margin-top: 20vh;
+        width: 50%;
+        height: 90%;
+    }
+    
 `;
