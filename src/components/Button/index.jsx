@@ -1,13 +1,11 @@
-import {MyButton} from './styles'
+import { MyButton } from './styles';
 
-function Button({ children }){
-
-    return(
-        <div>
-            <MyButton>{ children } </MyButton>
-        </div>
-    )
-
+function Button({ children, onClick }) {
+    return (
+        <MyButton onClick={onClick}>
+            {children}
+        </MyButton>
+    );
 }
 
 export default Button;

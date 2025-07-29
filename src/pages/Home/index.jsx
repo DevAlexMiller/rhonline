@@ -1,15 +1,21 @@
-import {Title} from './styles' 
-import Button from '../../components/Button';
-import InputComponent from '../../components/Inputs';
+import { HomePage, HomeContent } from './styles';
+import { useSearchParams } from 'react-router-dom';
+import SideBar from '../../components/SideBar';
 
 function Home(){
+    const [searchParams] = useSearchParams();
+    const description = searchParams.get('description')
+    console.log("CPF recebido:", description)
 
     return (
-        <div>
-            <Title>RH Online</Title>
-            <Button></Button>
-            <InputComponent />
-        </div>
+        <HomePage>
+            <SideBar>
+
+            </SideBar>
+            <HomeContent>
+
+            </HomeContent>
+        </HomePage>
     )
 }
 

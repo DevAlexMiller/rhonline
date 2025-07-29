@@ -1,6 +1,9 @@
 import styled from 'styled-components'
 
-export const Title = styled.h1 `
-    color: green;
-    background-color: blue;
+export const HomePage = styled.div `
+    background-color: red;
+`
+
+export const HomeContent = styled.div `
+    background-color: green;
 `

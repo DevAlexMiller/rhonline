@@ -1,11 +1,9 @@
 import styled from 'styled-components'
 import breakpoints from '../../styles/breakpoints'
 
-
 export const LoginPage = styled.div `
     background-color: white;
     display: flex;
-
 `
 
 export const LoginContent = styled.div `
@@ -23,7 +21,6 @@ export const LoginContent = styled.div `
         width: 100vw;
         height: 100vh;
     }
-    
 `
 
 export const LoginLogo = styled.div `
@@ -52,8 +49,8 @@ export const PageLogo = styled.div `
     position: relativa;
     margin-top: -30vh;
     margin-bottom: 10vh;
-
 `
+
 export const LogoImg = styled.img`
     width: 100%;
     max-width: 200px;
@@ -75,5 +72,4 @@ export const LogoImg = styled.img`
         width: 50%;
         height: 90%;
     }
-    
 `;

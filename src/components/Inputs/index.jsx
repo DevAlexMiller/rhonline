@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { InputWrapper, MyInput, IconButton } from './styles';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
-const InputComponent = ({ placeholder, iconPath, isPassword = false }) => {
+const InputComponent = ({ placeholder, iconPath, isPassword = false, value, onChange }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const toggleVisibility = () => setShowPassword(prev => !prev);
@@ -13,6 +13,8 @@ const InputComponent = ({ placeholder, iconPath, isPassword = false }) => {
         type={isPassword && showPassword ? 'text' : isPassword ? 'password' : 'text'}
         placeholder={placeholder}
         iconPath={iconPath}
+        value={value}
+        onChange={onChange}
       />
       {isPassword && (
         <IconButton onClick={toggleVisibility} type="button">
