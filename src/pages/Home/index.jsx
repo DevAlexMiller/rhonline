@@ -1,6 +1,6 @@
-import { HomePage, HomeContent } from './styles';
+import { HomePage} from './styles';
 import { useSearchParams } from 'react-router-dom';
-import SideBar from '../../components/SideBar';
+import Sidebar from '../../components/SideBar';
 
 function Home(){
     const [searchParams] = useSearchParams();
@@ -9,12 +9,7 @@ function Home(){
 
     return (
         <HomePage>
-            <SideBar>
-
-            </SideBar>
-            <HomeContent>
-
-            </HomeContent>
+            <Sidebar isAdmin={true}/>
         </HomePage>
     )
 }

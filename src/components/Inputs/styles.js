@@ -10,7 +10,6 @@ export const MyInput = styled.input`
   padding: 1vh 2.5vw 1vh 3.5vw;
   outline: none;
   font-size: 1.5vw ;
-
   background: ${props =>
     props.iconPath ? `url(${props.iconPath}) no-repeat 0.9vw center` : 'none'};
   background-size: 2vw 2vw;
@@ -50,7 +49,6 @@ export const InputWrapper = styled.div`
   margin: 1vh 0;
 `;
 
-
 export const IconButton = styled.button`
   position: absolute;
   top: 50%;
@@ -63,7 +61,6 @@ export const IconButton = styled.button`
   justify-content: center;
   cursor: pointer;
   color: #666;
-
   &:hover {
     color: #960202;
   }

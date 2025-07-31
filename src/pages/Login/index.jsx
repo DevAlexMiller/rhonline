@@ -21,24 +21,20 @@ function Login() {
                 <PageLogo>
                     <LogoImg src="/rhonlineBlack.svg" />
                 </PageLogo>
-
                 <InputComponent
                     placeholder="CPF"
                     iconPath="/userBlack.svg"
                     value={cpf}
                     onChange={e => setCpf(e.target.value)}
                 />
-
                 <InputComponent
                     placeholder="SENHA"
                     iconPath="/keyBlack.svg"
                     type="password"
                     isPassword={true}
                 />
-
                 <Button onClick={onVerificationClick}>Login</Button>
             </LoginContent>
-
             <LoginLogo>
                 <img src="/superbom.svg" />
             </LoginLogo>
