@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const MySidebar = styled.div`
-  position: fixed;
+  position: relative;
   left: 0;
   top: 0;
   width: ${props => (props.$open ? '200px' : '60px')};
@@ -12,7 +12,7 @@ export const MySidebar = styled.div`
   align-items: ${props => (props.$open ? 'flex-start' : 'center')};
   padding-top: 6vh;
   gap: 2vh;
-  transition: width 0.6s;
+  transition: width 0.5s;
   svg {
     color: white;
     width: 5vw;

@@ -21,7 +21,7 @@ const Sidebar = ({ isAdmin }) => {
 
   return (
     <MySidebar $open={open}>
-      <MenuItem style={{ marginBottom: '10vh' }}>
+      <MenuItem style={{ marginBottom: '17vh' }}>
         <IconContainer onClick={() => setOpen(!open)}>
           <FaBars />
         </IconContainer>
