@@ -13,7 +13,7 @@ function Home(){
         <HomePage>
             <Sidebar isAdmin={true} />
             <MyGrid>
-                <img src="/rhonlineBlack.svg" />
+                <img src="/rhonlineBlack.svg"/>
                 <Grid />
             </MyGrid>
         </HomePage>

@@ -15,7 +15,7 @@ export const MyButton = styled.button`
   &:hover {
     color: white;
     background-color: #960202;
-    border: 0.15vw solid #960202;
+    border: 0.15vw #960202;
   }
 
   @media ${breakpoints.bg} {

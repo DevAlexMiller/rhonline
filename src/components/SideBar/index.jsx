@@ -4,12 +4,23 @@ import { TiHome } from 'react-icons/ti';
 import { ImKey, ImExit } from 'react-icons/im';
 import { GiHouseKeys } from 'react-icons/gi';
 import {MySidebar, MenuItem, IconContainer, Label} from './styles';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ isAdmin }) => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  function onVerificationClick(index) {
+    if (index == 1){
+    }
+    
+    else if (index == 2){
+    }
+  }
+
   const menuItems = [
-    { icon: <TiHome className='icon-home'/>, label: 'Início' },
-    { icon: <ImKey />, label: 'Alterar senha' },
+    { icon: <TiHome className='icon-home' onClick={onVerificationClick(1)}/>, label: 'Início' },
+    { icon: <ImKey onClick={onVerificationClick(2)}/>, label: 'Alterar senha' },
     ...(isAdmin
       ? [
           { icon: <GiHouseKeys />, label: 'Gerenciar senhas' },
