@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BiSolidFilePdf, BiSearch } from 'react-icons/bi';
-import contracheques from './contracheques.json';
 import {
   RoundedTable,
   GridContainer,
@@ -10,24 +8,25 @@ import {
   SearchWrapper,
   SearchInput
 } from './styles';
+import { BiSearch } from 'react-icons/bi';
 
-const Grid = () => {
+const Grid = ({ columns, data }) => {
   const [quantidade, setQuantidade] = useState(5);
   const [busca, setBusca] = useState('');
 
-  const linhas = Object.values(contracheques);
+  const linhas = Array.isArray(data) ? data : Object.values(data);
 
   const linhasFiltradas = linhas.filter((linha) => {
-    const ano = linha["Ano"].toString().toLowerCase();
-    const mes = linha["Mês"].toLowerCase();
     const termoBusca = busca.toLowerCase();
-    return ano.includes(termoBusca) || mes.includes(termoBusca);
+    return Object.values(linha)
+      .some(value => value?.toString().toLowerCase().includes(termoBusca));
   });
 
   const linhasExibidas = linhasFiltradas.slice(0, quantidade);
 
   return (
     <GridContainer>
+      {/* Filtros */}
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2vh' }}>
         <QuantidadeWrapper>
           <label htmlFor="quantidadeSelect"><strong>Quantidade:</strong></label>
@@ -57,6 +56,7 @@ const Grid = () => {
         </div>
       </div>
 
+      {/* Tabela */}
       <div style={{ borderRadius: '12px', overflow: 'hidden' }}>
         <RoundedTable
           striped
@@ -67,33 +67,19 @@ const Grid = () => {
         >
           <thead className="table-light">
             <tr>
-              <th style={{ textAlign: 'center' }}>Ano</th>
-              <th style={{ textAlign: 'center' }}>Mês</th>
-              <th style={{ textAlign: 'center' }}>Contracheque simples</th>
-              <th style={{ textAlign: 'center' }}>Contracheque detalhado</th>
+              {columns.map((col, idx) => (
+                <th key={idx} style={{ textAlign: 'center' }}>{col.label}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {linhasExibidas.map((linha, index) => (
               <tr key={index}>
-                <td style={{ verticalAlign: 'middle' }}>{linha["Ano"]}</td>
-                <td style={{ verticalAlign: 'middle' }}>{linha["Mês"]}</td>
-                <td style={{ verticalAlign: 'middle' }}>
-                  <BiSolidFilePdf
-                    color="#000"
-                    size="1.5em"
-                    style={{ cursor: 'pointer' }}
-                    title="Baixar contracheque simples"
-                  />
-                </td>
-                <td style={{ verticalAlign: 'middle' }}>
-                  <BiSolidFilePdf
-                    color="#000"
-                    size="1.5em"
-                    style={{ cursor: 'pointer' }}
-                    title="Baixar contracheque detalhado"
-                  />
-                </td>
+                {columns.map((col, idx) => (
+                  <td key={idx} style={{ verticalAlign: 'middle' }}>
+                    {linha[col.key]}
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>

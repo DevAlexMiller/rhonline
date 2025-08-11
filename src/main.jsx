@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Password from './pages/NewPassword';
+import ResetPassword from './pages/ResetPassword';
+import NewUser from './pages/NewUser';
 import MyStyles from './styles/globalStyles';
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 
@@ -16,8 +18,16 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/NewPassword",
+    path: "/newPassword",
     element: <Password />,
+  },
+  {
+    path: "/resetPassword",
+    element: <ResetPassword />
+  },
+  {
+    path: "/newUser",
+    element: <NewUser />
   },
 ]);
 
