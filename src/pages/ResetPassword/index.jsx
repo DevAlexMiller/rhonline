@@ -47,7 +47,7 @@ function ResetPassword() {
 
   return (
     <ResetPage>
-      <Sidebar isAdmin={true} />
+      <Sidebar />
       <MyGrid>
         <img src="/rhonlineBlack.svg" alt="Logo" />
         <Grid columns={columns} data={dadosComAcao} />

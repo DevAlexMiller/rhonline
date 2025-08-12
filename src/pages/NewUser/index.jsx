@@ -1,19 +1,19 @@
 import Sidebar from "../../components/SideBar";
-import { MyUser, Newuser } from "./styles";
+import { MyUser, Newuser, AdmInput } from "./styles";
 import InputComponent from "../../components/Inputs";
 import Button from "../../components/Button";
 
 function NewUser() {
   return (
     <MyUser>
-      <Sidebar isAdmin={true} />
+      <Sidebar />
       <Newuser>
         <img src="/rhonlineBlack.svg" alt="RH Online" className="rhLogo" />
-        <p>Adicionar novo usuário</p>
+        <h3>Adicionar novo usuário</h3>
         <hr />
         <div className="input">
             <div className="input-group">
-                <label htmlFor="currentPassword">CPF</label>
+                <label htmlFor="currentPassword"></label>
                 <div className="input-field">
                     <InputComponent
                         id="currentPassword"
@@ -24,6 +24,10 @@ function NewUser() {
                     />
                 </div>
             </div>
+            <AdmInput>
+                <p>Administrador</p>
+                <input type="checkbox" />
+            </AdmInput>
             <Button>Adicionar</Button>
         </div>
       </Newuser>

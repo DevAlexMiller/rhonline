@@ -6,7 +6,7 @@ import Button from "../../components/Button";
 function Password() {
   return (
     <MyPassword>
-      <Sidebar isAdmin={true} />
+      <Sidebar />
 
       <NewPassword>
         <img src="/rhonlineBlack.svg" alt="RH Online" className="rhLogo" />

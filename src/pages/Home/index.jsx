@@ -50,7 +50,7 @@ function Home() {
 
   return (
     <HomePage>
-      <Sidebar isAdmin={true} />
+      <Sidebar />
       <MyGrid>
         <img src="/rhonlineBlack.svg" alt="Logo" />
         <Grid columns={columns} data={dadosComIcones} />

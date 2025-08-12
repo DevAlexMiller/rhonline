@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBars, FaUserPlus } from "react-icons/fa";
 import { TiHome } from "react-icons/ti";
@@ -6,21 +6,40 @@ import { ImKey, ImExit } from "react-icons/im";
 import { GiHouseKeys } from "react-icons/gi";
 import { MySidebar, MenuItem, IconContainer, Label } from "./styles";
 
-const Sidebar = ({ isAdmin }) => {
+const Sidebar = () => {
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
-  function onVerificationClick(index) {
-    if (!open) return; // só navega se a sidebar estiver aberta
+  useEffect(() => {
+    const adminFlag = sessionStorage.getItem('isAdmin') === 'true';
+    setIsAdmin(adminFlag);
+  }, []);
 
+  function onVerificationClick(index) {
+    // Se sidebar estiver fechada, abre antes de executar ação
+    if (!open) {
+      setOpen(true);
+      return;
+    }
+
+    // Roteamento
     const routes = {
       1: "/home",
       2: "/newPassword",
       3: "/resetPassword",
       4: "/newUser",
-      5: "/",
+      5: "/", // Logout
     };
 
+    // Se for logout
+    if (index === 5) {
+      sessionStorage.clear(); // Limpa todas as infos da sessão
+      navigate("/");
+      return;
+    }
+
+    // Se for outra rota
     if (routes[index]) {
       navigate(routes[index]);
     }

@@ -7,7 +7,7 @@ export const MyUser = styled.div`
   overflow: hidden;
 `;
 
-export const NewUser = styled.div`
+export const Newuser = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -16,6 +16,11 @@ export const NewUser = styled.div`
   padding: 2rem;
   overflow-y: auto;
   
+  p{
+    color: #000;
+    font-size: 10px;
+  };
+
   .user-info {
     display: flex;
     align-items: flex-start;
@@ -36,12 +41,6 @@ export const NewUser = styled.div`
         font-size: 1rem;
         margin: 0;
       }
-
-      hr {
-        border: none;
-        border-bottom: 0.0625rem solid #000;
-        margin: 0.25rem 0 0.75rem;
-      }
     }
   }
 
@@ -50,44 +49,83 @@ export const NewUser = styled.div`
     height: 25vh;
     object-fit: contain;
     display: block;
-    margin: 0 auto 2rem auto;
+    margin: -12rem auto 2rem auto;
     align-items: center;
   }
 
   .input {
-  width: 100%;
-  max-width: 60vw;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-
-  .input-group {
+    width: 100%;
+    max-width: 60vw;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    gap: 1.5rem;
 
-    label {
-      font-size: 1rem;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      text-align: left;
-      margin-left: 30vh;
-    }
-
-    .input-field {
-      width: 100%;
+    .input-group {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
+      width: 100%;
+
+      label {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        margin-left: 30vh;
+      }
+
+      .input-field {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    button {
+      align-self: center;
+      width: fit-content;
     }
   }
+`;
 
-  button {
-    align-self: center;
-    width: fit-content;
+export const AdmInput = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* Alinha verticalmente */
+  justify-content: center;
+  gap: 12px; /* Espaçamento horizontal entre texto e checkbox */
+
+  p {
+    font-size: 1.1rem;
+    margin: 0;
   }
-}
 
-}
+  /* Mantendo a estilização anterior da caixa */
+  input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid red; 
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    background-color: white;
+  }
 
+  input[type="checkbox"]:checked {
+    background-color: red;
+    border-color: red;
+  }
+
+  input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
 `;

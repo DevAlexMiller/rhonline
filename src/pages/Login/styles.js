@@ -47,7 +47,7 @@ export const PageLogo = styled.div `
     text-align: center;
     background-color: transparent;
     position: relativa;
-    margin-top: -30vh;
+    margin-top: -20vh;
     margin-bottom: 10vh;
 `
 
