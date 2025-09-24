@@ -73,3 +73,11 @@ export const LogoImg = styled.img`
         height: 90%;
     }
 `;
+
+export const FormItemsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3vh; /* Ou o valor que você preferir para o espaçamento */
+  width: 100%; /* Garante que o wrapper ocupe a largura total */
+  align-items: center; /* Centraliza os itens */
+`;
