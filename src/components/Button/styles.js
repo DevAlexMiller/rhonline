@@ -2,7 +2,7 @@ import styled from "styled-components";
 import breakpoints from "../../styles/breakpoints";
 
 export const MyButton = styled.button`
-  width: 20%;
+  width: 40%;
   min-height: 30px;
   border-radius: 5vw;
   background-color: #E40404;

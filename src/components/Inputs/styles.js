@@ -44,7 +44,7 @@ export const MyInput = styled.input`
 
 export const InputWrapper = styled.div`
   position: relative;
-  width: 50%; // mesmo que MyInput
+  width: 80%; // mesmo que MyInput
   height: 6vh;
   margin: 1vh 0;
 `;
