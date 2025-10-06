@@ -7,73 +7,81 @@ import { GiHouseKeys } from "react-icons/gi";
 import { MySidebar, MenuItem, IconContainer, Label } from "./styles";
 
 const Sidebar = () => {
-  const [open, setOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const adminFlag = sessionStorage.getItem('isAdmin') === 'true';
-    setIsAdmin(adminFlag);
-  }, []);
+  useEffect(() => {
+    // CORREÇÃO: A flag de admin é salva no localStorage após o login
+    const adminFlag = localStorage.getItem('isAdmin') === 'true'; 
+    setIsAdmin(adminFlag);
+    
+    // Limpar sessionStorage aqui se você parou de usá-lo
+    if (sessionStorage.length > 0) {
+        sessionStorage.clear();
+    }
 
-  function onVerificationClick(index) {
-    // Se sidebar estiver fechada, abre antes de executar ação
-    if (!open) {
-      setOpen(true);
-      return;
-    }
+  }, []);
 
-    // Roteamento
-    const routes = {
-      1: "/home",
-      2: "/newPassword",
-      3: "/resetPassword",
-      4: "/newUser",
-      5: "/", // Logout
-    };
+  function onVerificationClick(index) {
+    // Se sidebar estiver fechada, abre antes de executar ação
+    if (!open) {
+      setOpen(true);
+      return;
+    }
 
-    // Se for logout
-    if (index === 5) {
-      sessionStorage.clear(); // Limpa todas as infos da sessão
-      navigate("/");
-      return;
-    }
+    // Roteamento
+    const routes = {
+      1: "/home",
+      2: "/newPassword", // Rota que ativa a tela de Profile/Troca de Senha
+      3: "/resetPassword",
+      4: "/newUser",
+      5: "/", // Logout
+    };
 
-    // Se for outra rota
-    if (routes[index]) {
-      navigate(routes[index]);
-    }
-  }
+    // Se for logout (índice 5)
+    if (index === 5) {
+      // CORREÇÃO: Limpa o localStorage onde o token JWT e o código do funcionário estão salvos
+      localStorage.clear(); 
+      navigate("/");
+      return;
+    }
 
-  const menuItems = [
-    { icon: <TiHome className="icon-home" />, label: "Início", index: 1 },
-    { icon: <ImKey />, label: "Alterar senha", index: 2 },
-    ...(isAdmin
-      ? [
-          { icon: <GiHouseKeys />, label: "Gerenciar senhas", index: 3 },
-          { icon: <FaUserPlus />, label: "Novo usuário", index: 4 },
-        ]
-      : []),
-    { icon: <ImExit />, label: "Sair", index: 5 },
-  ];
+    // Se for outra rota
+    if (routes[index]) {
+      navigate(routes[index]);
+    }
+  }
 
-  return (
-    <MySidebar $open={open}>
-      <MenuItem style={{ marginBottom: "17vh" }}>
-        <IconContainer onClick={() => setOpen(!open)}>
-          <FaBars />
-        </IconContainer>
-        {open && <Label></Label>}
-      </MenuItem>
+  const menuItems = [
+    { icon: <TiHome className="icon-home" />, label: "Início", index: 1 },
+    { icon: <ImKey />, label: "Alterar senha", index: 2 },
+    ...(isAdmin
+      ? [
+          { icon: <GiHouseKeys />, label: "Gerenciar senhas", index: 3 },
+          { icon: <FaUserPlus />, label: "Novo usuário", index: 4 },
+        ]
+      : []),
+    { icon: <ImExit />, label: "Sair", index: 5 },
+  ];
 
-      {menuItems.map((item, idx) => (
-        <MenuItem key={idx} onClick={() => onVerificationClick(item.index)}>
-          <IconContainer>{item.icon}</IconContainer>
-          {open && <Label>{item.label}</Label>}
-        </MenuItem>
-      ))}
-    </MySidebar>
-  );
+  return (
+    <MySidebar $open={open}>
+      <MenuItem style={{ marginBottom: "17vh" }}>
+        <IconContainer onClick={() => setOpen(!open)}>
+          <FaBars />
+        </IconContainer>
+        {open && <Label></Label>}
+      </MenuItem>
+
+      {menuItems.map((item, idx) => (
+        <MenuItem key={idx} onClick={() => onVerificationClick(item.index)}>
+          <IconContainer>{item.icon}</IconContainer>
+          {open && <Label>{item.label}</Label>}
+        </MenuItem>
+      ))}
+    </MySidebar>
+  );
 };
 
 export default Sidebar;

@@ -1,4 +1,4 @@
-import { LoginContent, LoginLogo, LoginPage, PageLogo, LogoImg, FormItemsWrapper } from './styles'; // Importe FormItemsWrapper
+import { LoginContent, LoginLogo, LoginPage, PageLogo, LogoImg, FormItemsWrapper } from './styles';
 import Button from '../../components/Button';
 import InputComponent from '../../components/Inputs';
 import { useState } from 'react';
@@ -24,16 +24,20 @@ function Login() {
             const { success, message, data } = response.data;
             
             if (success) {
-                const { token, isAdmin } = data;
+                // 🛑 CORREÇÃO 1: Garante que 'isAdmin' e 'cpf' são desestruturados
+                const { token, isAdmin, codigoFuncionario, cpf } = data; 
                 
+                console.log("Dados recebidos do servidor:", isAdmin);
+
+                // 🛑 CORREÇÃO 2: Salva explicitamente a flag booleana como string "true" ou "false"
                 localStorage.setItem('authToken', token);
                 localStorage.setItem('isAdmin', isAdmin);
+                localStorage.setItem('codigoFuncionario', codigoFuncionario);
+                localStorage.setItem('cpf', cpf); 
 
-                console.log("Login realizado com sucesso! Token:", token);
+                console.log("Login realizado com sucesso! Código:", codigoFuncionario);
                 
-                const query = new URLSearchParams();
-                query.set("description", cpf);
-                navigate(`/home?${query.toString()}`);
+                navigate(`/home`);
             } else {
                 setErrorMessage(message);
             }
@@ -55,7 +59,7 @@ function Login() {
                 </PageLogo>
                 
                 <form onSubmit={onVerificationClick}>
-                    <FormItemsWrapper> {/* Envolva os itens aqui */}
+                    <FormItemsWrapper>
                         <InputComponent
                             placeholder="CPF"
                             iconPath="/userBlack.svg"
