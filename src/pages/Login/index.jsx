@@ -24,10 +24,9 @@ function Login() {
             const { success, message, data } = response.data;
             
             if (success) {
+                console.log("Dados recebidos:", data); // Log dos dados recebidos
                 // 🛑 CORREÇÃO 1: Garante que 'isAdmin' e 'cpf' são desestruturados
                 const { token, isAdmin, codigoFuncionario, cpf } = data; 
-                
-                console.log("Dados recebidos do servidor:", isAdmin);
 
                 // 🛑 CORREÇÃO 2: Salva explicitamente a flag booleana como string "true" ou "false"
                 localStorage.setItem('authToken', token);

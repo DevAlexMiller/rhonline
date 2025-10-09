@@ -11,6 +11,7 @@ function Home() {
     const [availablePeriods, setAvailablePeriods] = useState([]);
     const [loading, setLoading] = useState(true);
     
+
     // Busca o código do funcionário diretamente do localStorage
     const employeeCode = localStorage.getItem('codigoFuncionario'); 
 
@@ -174,7 +175,10 @@ function Home() {
         <Sidebar />
         <MyGrid>
           <img src="/rhonlineBlack.svg" alt="Logo" />
-          <Grid columns={columns} data={availablePeriods} />
+          <Grid 
+          columns={columns} 
+          data={availablePeriods} 
+          showAdminControls={true} />
         </MyGrid>
       </HomePage>
     );
