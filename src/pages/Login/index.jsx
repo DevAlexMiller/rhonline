@@ -24,23 +24,33 @@ function Login() {
             const { success, message, data } = response.data;
             
             if (success) {
-                console.log("Dados recebidos:", data); // Log dos dados recebidos
-                // 🛑 CORREÇÃO 1: Garante que 'isAdmin' e 'cpf' são desestruturados
-                const { token, isAdmin, codigoFuncionario, cpf } = data; 
-
-                // 🛑 CORREÇÃO 2: Salva explicitamente a flag booleana como string "true" ou "false"
+                console.log("Dados recebidos:", data);
+                const { token, isAdmin, codigoFuncionario, cpf, cpfAsPassword } = data; 
+            
+                // Salva dados da sessão
                 localStorage.setItem('authToken', token);
-                localStorage.setItem('isAdmin', isAdmin);
+                localStorage.setItem('isAdmin', String(isAdmin)); 
                 localStorage.setItem('codigoFuncionario', codigoFuncionario);
                 localStorage.setItem('cpf', cpf); 
-
+            
+                // Flag de senha insegura
+                if (cpfAsPassword === true) {
+                    localStorage.setItem('CPF_AS_PASSWORD', 'true');
+                    alert("⚠️ Sua senha atual é igual ao CPF. Por segurança, é necessário alterá-la antes de continuar.");
+                    navigate('/newPassword'); // 🔁 Redireciona diretamente
+                    return; // impede seguir para /home
+                } else {
+                    localStorage.removeItem('CPF_AS_PASSWORD');
+                }
+            
                 console.log("Login realizado com sucesso! Código:", codigoFuncionario);
-                
-                navigate(`/home`);
+                navigate('/home');
             } else {
                 setErrorMessage(message);
             }
         } catch (error) {
+            // Garante que o flag de senha insegura é limpo em caso de falha no login
+            localStorage.removeItem('CPF_AS_PASSWORD'); 
             if (error.response) {
                 setErrorMessage(error.response.data.message);
             } else {

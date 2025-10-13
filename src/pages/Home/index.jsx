@@ -6,131 +6,195 @@ import Grid from '../../components/Grid';
 import { BiSolidFilePdf } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 
+// Componente para renderizar o ícone SVG do 13º Salário
+const ThirteenthIcon = ({ onClick, title }) => (
+    <img 
+        src="/13.svg"
+        alt="13º Salário" 
+        style={{ 
+            cursor: 'pointer', 
+            width: '2.2em', 
+            height: '2.2em',
+            verticalAlign: 'middle'
+        }}
+        onClick={onClick}
+        title={title}
+    />
+);
+
+
 function Home() {
     const navigate = useNavigate();
     const [availablePeriods, setAvailablePeriods] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+    const [reloadTrigger, setReloadTrigger] = useState(0); 
 
-    // Busca o código do funcionário diretamente do localStorage
     const employeeCode = localStorage.getItem('codigoFuncionario'); 
 
-    // Mapeamento de números de mês para nomes em português
     const monthNames = [
       "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
       "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
 
-    /**
-     * Função responsável por enviar a requisição ao backend para gerar o PDF
-     * e abrir o arquivo binário em uma nova guia.
-     */
-    async function handlePaycheckView(year, month, type) {
+    const API_URL_MONTHLY = 'http://10.92.11.254:3000/api/payroll/available-periods';
+    const API_URL_PAYCHECK = 'http://10.92.11.254:3000/api/payroll/paycheck';
+    const API_URL_THIRTEENTH = 'http://10.92.11.254:3000/api/payroll/thirteenth-paycheck';
+
+    const handleGridReload = () => {
+        setReloadTrigger(prev => prev + 1);
+    };
+
+
+    async function handlePaycheckView(year, month, viewType, dataType) {
         const token = localStorage.getItem('authToken');
         
         if (!token || !employeeCode) {
-            console.error("Dados de sessão ausentes.");
             navigate('/login');
             return;
         }
+        
+        // 🛑 CORREÇÃO CRÍTICA: Define qual URL usar
+        let routeUrl;
+        if (dataType === 'thirteenth') {
+            routeUrl = API_URL_THIRTEENTH;
+        } else {
+            routeUrl = API_URL_PAYCHECK;
+        }
+        
+        // O backend do 13º espera mês 12, que é o padrão do Protheus.
+        const targetMonth = dataType === 'thirteenth' ? 12 : month;
 
         try {
             const response = await axios.post(
-                'http://10.92.11.254:3000/api/payroll/paycheck', // Rota unificada
+                routeUrl, 
                 {
                     employeeCode: employeeCode,
-                    month: month,
+                    month: targetMonth, 
                     year: year,
-                    type: type,
+                    type: viewType, 
                     asPdf: 'true' 
                 },
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    },
-                    responseType: 'blob' // CRUCIAL: Recebe o PDF como dado binário
+                    headers: { Authorization: `Bearer ${token}` },
+                    responseType: 'blob' 
                 }
             );
 
-            // 1. Cria um objeto URL a partir do Blob (arquivo binário)
             const file = new Blob([response.data], { type: 'application/pdf' });
             const fileURL = URL.createObjectURL(file);
-
-            // 2. Abre a URL temporária em uma nova guia
             window.open(fileURL, '_blank');
             
-            // 3. Libera o objeto URL após um breve atraso
-            // Nota: Isso é importante para liberar memória, mas requer um pequeno delay
-            // ou ser feito quando a nova janela for fechada (o que é mais complexo em React)
             setTimeout(() => {
                 URL.revokeObjectURL(fileURL);
             }, 10000); 
 
         } catch (error) {
-            console.error(`Erro ao visualizar holerite ${type}:`, error);
+            console.error(`Erro ao visualizar holerite ${viewType}/${dataType}:`, error);
             if (error.response?.status === 401) {
                 alert("Sessão expirada. Faça login novamente.");
                 navigate('/login');
             } else {
-                alert(`Falha ao visualizar o holerite ${type}.`);
+                alert(`Falha ao visualizar o holerite ${viewType}.`);
             }
         }
     }
 
 
     /**
-     * Função para buscar os períodos de holerite disponíveis
+     * Função para transformar os dados da API (para Holerites Mensais e 13º)
      */
-    async function fetchAvailablePeriods() {
+    const transformDataToGrid = (data, isThirteenth = false) => {
+        return data.map(item => {
+            const monthDisplay = isThirteenth ? '13º Salário' : monthNames[item.period - 1];
+            const dataType = isThirteenth ? 'thirteenth' : 'mensal';
+            
+            const IconComponent = isThirteenth ? ThirteenthIcon : BiSolidFilePdf;
+
+            // Função helper para evitar repetição de props
+            const getIconProps = (viewType) => {
+                const titleText = isThirteenth ? `${monthDisplay} ${viewType}` : `Contracheque ${viewType}`;
+                
+                // Os ícones do 13º Salário já estão definidos como imagem SVG com o tamanho correto
+                const commonProps = {
+                    title: `Visualizar ${titleText}`,
+                    onClick: () => handlePaycheckView(item.year, item.period, viewType, dataType),
+                };
+                
+                if (isThirteenth) {
+                    // Retorna apenas props de clique e título para o ThirteenthIcon
+                    return commonProps;
+                } else {
+                    // Retorna props de estilo para o BiSolidFilePdf
+                    return {
+                        ...commonProps,
+                        color: "#000",
+                        size: "2.2em",
+                        style: { cursor: 'pointer' }
+                    };
+                }
+            };
+            
+
+            return {
+                _year: item.year,
+                _month: item.period, 
+                _dataType: dataType, 
+                
+                Ano: item.year,
+                Mês: monthDisplay,
+                Simples: (
+                    <IconComponent {...getIconProps('simples')} />
+                ),
+                Detalhado: (
+                    <IconComponent {...getIconProps('detalhado')} />
+                )
+            };
+        });
+    };
+
+
+    async function fetchAllPeriods() {
+        setLoading(true);
         const token = localStorage.getItem('authToken');
         
         if (!token || !employeeCode) {
-            console.error("Token ou código do funcionário ausente.");
             setLoading(false);
+            navigate('/login');
             return;
         }
 
         try {
-            const response = await axios.post(
-                'http://10.92.11.254:3000/api/payroll/available-periods',
+            const monthlyResponse = await axios.post(
+                API_URL_MONTHLY,
                 { employeeCode: employeeCode },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            // CORREÇÃO: Acessa o array 'periods' dentro do objeto de resposta
-            const transformedData = response.data.periods.map(item => ({
-                _year: item.year,
-                _month: item.period, 
-                
-                Ano: item.year,
-                Mês: monthNames[item.period - 1],
-                Simples: (
-                    <BiSolidFilePdf
-                        color="#000"
-                        size="1.5em"
-                        style={{ cursor: 'pointer' }}
-                        title="Visualizar Contracheque simples"
-                        onClick={() => handlePaycheckView(item.year, item.period, 'simples')} // Chamada para a nova função
-                    />
-                ),
-                Detalhado: (
-                    <BiSolidFilePdf
-                        color="#000"
-                        size="1.5em"
-                        style={{ cursor: 'pointer' }}
-                        title="Visualizar Contracheque detalhado"
-                        onClick={() => handlePaycheckView(item.year, item.period, 'detalhado')} // Chamada para a nova função
-                    />
-                )
-            }));
+            const monthlyPeriods = monthlyResponse.data.periods || [];
+            let finalPeriods = [];
 
-            setAvailablePeriods(transformedData);
+            // Transforma e duplica os dados (para 13º Parcela)
+            monthlyPeriods.forEach(item => {
+                const isNovember = item.period === 11;
+                const isDecember = item.period === 12;
+                
+                // 1. Adiciona a linha Mensal Padrão
+                finalPeriods.push(transformDataToGrid([item], false)[0]);
+                
+                // 2. Duplica se for Novembro (1ª Parcela do 13º)
+                if (isNovember) {
+                     finalPeriods.push(transformDataToGrid([{ year: item.year, period: item.period }], true)[0]);
+                }
+
+                // 3. Duplica se for Dezembro (2ª Parcela do 13º)
+                if (isDecember) {
+                     finalPeriods.push(transformDataToGrid([{ year: item.year, period: item.period }], true)[0]);
+                }
+            });
+
+            setAvailablePeriods(finalPeriods);
         } catch (error) {
-            console.error("Erro ao buscar períodos de holerite:", error);
+            console.error("Erro ao buscar todos os períodos de holerite:", error);
             if (error.response?.status === 401) {
                 alert("Sessão expirada. Faça login novamente.");
                 navigate('/login');
@@ -140,15 +204,15 @@ function Home() {
         }
     }
 
-    // Chama a função de busca quando o componente é montado
+    // Chama a função de busca quando o componente é montado ou o trigger é ativado
     useEffect(() => {
         if (employeeCode) {
-            fetchAvailablePeriods();
+            fetchAllPeriods();
         } else {
             setLoading(false);
             navigate('/login');
         }
-    }, []); 
+    }, [employeeCode, reloadTrigger]); 
 
     const columns = [
       { key: "Ano", label: "Ano" },
@@ -178,7 +242,9 @@ function Home() {
           <Grid 
           columns={columns} 
           data={availablePeriods} 
-          showAdminControls={true} />
+          showAdminControls={true}
+          onActionSuccess={handleGridReload} 
+          />
         </MyGrid>
       </HomePage>
     );

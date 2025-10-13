@@ -102,7 +102,7 @@ const Grid = ({ columns, data, showAdminControls}) => {
         
         {/* 1. Esquerda: Quantidade */}
         <QuantidadeWrapper>
-          <label htmlFor="quantidadeSelect"><strong>Quantidade:</strong></label>
+          <label htmlFor="quantidadeSelect">Quantidade:</label>
           <QuantidadeSelect
             id="quantidadeSelect"
             value={quantidade}
@@ -113,6 +113,7 @@ const Grid = ({ columns, data, showAdminControls}) => {
             <option value={25}>25</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
+            <option value={linhasFiltradas.length}>Todos</option>
           </QuantidadeSelect>
         </QuantidadeWrapper>
 

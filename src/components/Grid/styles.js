@@ -54,7 +54,7 @@ export const QuantidadeSelect = styled.select`
   appearance: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
-  width: 5.2vw;
+  width: 6.5vw;
 
   &:focus {
     outline: none;

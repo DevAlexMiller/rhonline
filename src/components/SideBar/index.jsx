@@ -9,18 +9,20 @@ import { MySidebar, MenuItem, IconContainer, Label } from "./styles";
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [cpfAsPassword, setCpfAsPassword] = useState(false); // 🛑 NOVO ESTADO
   const navigate = useNavigate();
 
   useEffect(() => {
-    // CORREÇÃO: A flag de admin é salva no localStorage após o login
     const adminFlag = localStorage.getItem('isAdmin') === 'true'; 
     setIsAdmin(adminFlag);
     
-    // Limpar sessionStorage aqui se você parou de usá-lo
-    if (sessionStorage.length > 0) {
-        sessionStorage.clear();
-    }
+    // 🛑 VERIFICA O FLAG DE SENHA INSEGURA
+    const cpfAsPassFlag = localStorage.getItem('CPF_AS_PASSWORD') === 'true';
+    setCpfAsPassword(cpfAsPassFlag);
 
+    if (sessionStorage.length > 0) {
+        sessionStorage.clear();
+    }
   }, []);
 
   function onVerificationClick(index) {
@@ -30,10 +32,20 @@ const Sidebar = () => {
       return;
     }
 
+    // 🛑 BLOQUEIO DE NAVEGAÇÃO
+    // Se a senha for o CPF, só permite ir para a tela de troca de senha (index 2) ou sair (index 5)
+    if (cpfAsPassword && index !== 2 && index !== 5) {
+        alert('Você deve trocar sua senha antes de navegar para outras páginas.');
+        // Força a navegação de volta para a tela de troca de senha
+        navigate('/newPassword'); 
+        return;
+    }
+
+
     // Roteamento
     const routes = {
       1: "/home",
-      2: "/newPassword", // Rota que ativa a tela de Profile/Troca de Senha
+      2: "/newPassword", 
       3: "/resetPassword",
       4: "/newUser",
       5: "/", // Logout
@@ -41,7 +53,6 @@ const Sidebar = () => {
 
     // Se for logout (índice 5)
     if (index === 5) {
-      // CORREÇÃO: Limpa o localStorage onde o token JWT e o código do funcionário estão salvos
       localStorage.clear(); 
       navigate("/");
       return;
@@ -64,6 +75,15 @@ const Sidebar = () => {
       : []),
     { icon: <ImExit />, label: "Sair", index: 5 },
   ];
+    
+    // 🛑 Lógica para aplicar estilo de bloqueio visual
+    const getMenuItemStyle = (index) => {
+        // Se a senha for o CPF E o item não for a rota de troca de senha (2) ou Sair (5), aplica o estilo de bloqueio.
+        if (cpfAsPassword && index !== 2 && index !== 5) {
+            return { pointerEvents: 'none', opacity: 0.5 };
+        }
+        return {};
+    };
 
   return (
     <MySidebar $open={open}>
@@ -75,7 +95,11 @@ const Sidebar = () => {
       </MenuItem>
 
       {menuItems.map((item, idx) => (
-        <MenuItem key={idx} onClick={() => onVerificationClick(item.index)}>
+        <MenuItem 
+            key={idx} 
+            onClick={() => onVerificationClick(item.index)}
+            style={getMenuItemStyle(item.index)} // 🛑 Aplica o estilo de bloqueio
+        >
           <IconContainer>{item.icon}</IconContainer>
           {open && <Label>{item.label}</Label>}
         </MenuItem>
