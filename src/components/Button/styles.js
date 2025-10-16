@@ -18,8 +18,5 @@ export const MyButton = styled.button`
     border: 0.15vw #960202;
   }
 
-  @media ${breakpoints.bg} {
-    width: 20%;
-    
-  }
+ 
 `;

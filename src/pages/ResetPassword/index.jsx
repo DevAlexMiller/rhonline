@@ -14,9 +14,13 @@ function ResetPassword() {
     
     const navigate = useNavigate();
 
+const navigateToHome = () => {
+    navigate('/home');
+};
+
     // Endpoints conforme seu setup:
-    const API_URL_USERS = 'http://localhost:3000/api/usuarios'; // Rota para listar usuários (GET)
-    const API_URL_RESET = 'http://10.92.11.254:3000/api/reset-password'; // Rota para resetar (POST)
+    const API_URL_USERS = 'http://10.92.11.8:3000/api/usuarios'; // Rota para listar usuários (GET)
+    const API_URL_RESET = 'http://10.92.11.8:3000/api/reset-password'; // Rota para resetar (POST)
 
     const token = localStorage.getItem('authToken');
     const isAdmin = localStorage.getItem('isAdmin') === 'true';
@@ -45,7 +49,7 @@ function ResetPassword() {
 
             if (response.data.success) {
                 const newPass = response.data.data.newPassword;
-                setStatusMessage(`Senha redefinida para o cpf`);
+                setStatusMessage(`Senha redefinida para o CPF`);
             } else {
                 setStatusMessage(`❌ Erro: ${response.data.message}`);
             }
@@ -144,7 +148,7 @@ function ResetPassword() {
         <ResetPage>
             <Sidebar />
             <MyGrid>
-                <img src="/rhonlineBlack.svg" alt="Logo" />
+                <img src="/rhonlineBlack.svg" alt="Logo" onClick={navigateToHome} style={{cursor: 'pointer'}}/>
                 {statusMessage && <p style={{ color: isAdmin ? 'blue' : 'red', fontWeight: 'bold' }}>{statusMessage}</p>}
                 <Grid columns={columns} data={dadosComAcao} />
             </MyGrid>

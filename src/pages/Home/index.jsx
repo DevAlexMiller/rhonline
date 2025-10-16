@@ -22,6 +22,9 @@ const ThirteenthIcon = ({ onClick, title }) => (
     />
 );
 
+const navigateToHome = () => {
+    navigate('/home');
+};
 
 function Home() {
     const navigate = useNavigate();
@@ -36,9 +39,9 @@ function Home() {
       "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
 
-    const API_URL_MONTHLY = 'http://10.92.11.254:3000/api/payroll/available-periods';
-    const API_URL_PAYCHECK = 'http://10.92.11.254:3000/api/payroll/paycheck';
-    const API_URL_THIRTEENTH = 'http://10.92.11.254:3000/api/payroll/thirteenth-paycheck';
+    const API_URL_MONTHLY = 'http://10.92.11.8:3000/api/payroll/available-periods';
+    const API_URL_PAYCHECK = 'http://10.92.11.8:3000/api/payroll/paycheck';
+    const API_URL_THIRTEENTH = 'http://10.92.11.8:3000/api/payroll/thirteenth-paycheck';
 
     const handleGridReload = () => {
         setReloadTrigger(prev => prev + 1);
@@ -49,7 +52,7 @@ function Home() {
         const token = localStorage.getItem('authToken');
         
         if (!token || !employeeCode) {
-            navigate('/login');
+            navigate('/');
             return;
         }
         
@@ -92,7 +95,7 @@ function Home() {
             console.error(`Erro ao visualizar holerite ${viewType}/${dataType}:`, error);
             if (error.response?.status === 401) {
                 alert("Sessão expirada. Faça login novamente.");
-                navigate('/login');
+                navigate('/');
             } else {
                 alert(`Falha ao visualizar o holerite ${viewType}.`);
             }
@@ -159,7 +162,7 @@ function Home() {
         
         if (!token || !employeeCode) {
             setLoading(false);
-            navigate('/login');
+            navigate('/');
             return;
         }
 
@@ -197,7 +200,7 @@ function Home() {
             console.error("Erro ao buscar todos os períodos de holerite:", error);
             if (error.response?.status === 401) {
                 alert("Sessão expirada. Faça login novamente.");
-                navigate('/login');
+                navigate('/');
             }
         } finally {
             setLoading(false);
@@ -210,7 +213,7 @@ function Home() {
             fetchAllPeriods();
         } else {
             setLoading(false);
-            navigate('/login');
+            navigate('/');
         }
     }, [employeeCode, reloadTrigger]); 
 
@@ -238,7 +241,7 @@ function Home() {
       <HomePage>
         <Sidebar />
         <MyGrid>
-          <img src="/rhonlineBlack.svg" alt="Logo" />
+          <img src="/rhonlineBlack.svg" alt="Logo" onClick={navigateToHome} style={{cursor: 'pointer'}} />
           <Grid 
           columns={columns} 
           data={availablePeriods} 

@@ -16,6 +16,10 @@ function NewUser() {
     const navigate = useNavigate();
     const token = localStorage.getItem('authToken');
 
+    const navigateToHome = () => {
+        navigate('/home');
+    };
+
     // === LÓGICA DE CRIAÇÃO DE USUÁRIO ===
     async function handleCreateUser(e) {
         e.preventDefault();
@@ -36,7 +40,7 @@ function NewUser() {
         }
 
         try {
-            const API_URL = 'http://localhost:3000/api/create';
+            const API_URL = 'http://10.92.11.8:3000/api/create';
 
             const response = await axios.post(
                 API_URL,
@@ -77,7 +81,7 @@ function NewUser() {
         <MyUser>
           <Sidebar />
           <Newuser>
-            <img src="/rhonlineBlack.svg" alt="RH Online" className="rhLogo" />
+            <img src="/rhonlineBlack.svg" alt="RH Online" className="rhLogo" onClick={navigateToHome} style={{cursor: 'pointer'}}/>
             <h3>Adicionar novo usuário</h3>
             <hr />
             {statusMessage && (

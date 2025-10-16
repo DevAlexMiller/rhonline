@@ -16,7 +16,7 @@ function Login() {
         setErrorMessage('');
         
         try {
-            const response = await axios.post('http://10.92.11.254:3000/api/login', {
+            const response = await axios.post('http://10.92.11.8:3000/api/login', {
                 cpf: cpf,
                 senha: senha
             });

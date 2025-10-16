@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import breakpoints from '../../styles/breakpoints';
 
 export const MyPassword = styled.div`
   display: flex;
@@ -56,7 +57,7 @@ export const NewPassword = styled.div`
 
   .input {
   width: 100%;
-  max-width: 60vw;
+  max-width: 40vw;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -71,7 +72,7 @@ export const NewPassword = styled.div`
       font-weight: 500;
       margin-bottom: 0.5rem;
       text-align: left;
-      margin-left: 30vh;
+      margin-left: 10vh;
     }
 
     .input-field {
@@ -90,4 +91,8 @@ export const NewPassword = styled.div`
 
 }
 
+@media ${breakpoints.sm}{
+    display: flex;
+    flex-direction: column;
+  }
 `;

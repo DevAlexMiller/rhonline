@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import breakpoints from '../../styles/breakpoints';
 
 export const MyUser = styled.div`
   display: flex;
@@ -49,13 +50,13 @@ export const Newuser = styled.div`
     height: 25vh;
     object-fit: contain;
     display: block;
-    margin: -12rem auto 2rem auto;
+    margin: -10rem auto 2rem auto;
     align-items: center;
   }
 
   .input {
     width: 100%;
-    max-width: 60vw;
+    max-width: 40vw;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -84,6 +85,19 @@ export const Newuser = styled.div`
     button {
       align-self: center;
       width: fit-content;
+    }
+  }
+
+  @media ${breakpoints.sm}{
+    .input {
+      width: 100%;
+      max-width: 80vw;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .label {
+      width: 40%;
     }
   }
 `;

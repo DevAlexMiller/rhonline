@@ -1,9 +1,15 @@
 import styled from 'styled-components';
 import { Table } from 'react-bootstrap';
+import breakpoints from '../../styles/breakpoints';
 // import { MyButton } from '../Button/styles'; // Importação que você mencionou
 
 export const GridContainer = styled.div`
   padding: 2vh;
+  @media ${breakpoints.sm}{
+    max-width: 90%;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 export const FilterControls = styled.div`
@@ -25,6 +31,11 @@ export const FilterControls = styled.div`
     display: flex;
     justify-content: flex-end;
   }
+  @media ${breakpoints.sm}{
+    flex-direction: column;
+    gap: 2vh;
+    align-items: center;
+    }
 `;
 
 export const QuantidadeWrapper = styled.div`
@@ -41,6 +52,12 @@ export const QuantidadeWrapper = styled.div`
   select {
     margin-left: 0.3rem; /* Ajuste fino, também responsivo */
   }
+
+  @media ${breakpoints.sm}{
+    align-items: center;
+    justify-content: center;
+    margin-right: 0;
+    }
 `;
 
 export const QuantidadeSelect = styled.select`
@@ -61,6 +78,10 @@ export const QuantidadeSelect = styled.select`
     border-color: #999;
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
   }
+
+  @media ${breakpoints.sm}{
+    width: 20vw;
+    }
 `;
 
 export const ButtonWrapper = styled.div`
@@ -76,6 +97,17 @@ export const ButtonWrapper = styled.div`
     justify-content: center;
     height: 3vh; 
     width: 10vw;
+  }
+
+  @media ${breakpoints.sm}{
+    width: 100%;
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 3vh; 
+      width: 25vw;
+    }
   }
 `;
 
@@ -133,4 +165,8 @@ export const RoundedTable = styled(Table)`
     text-align: center;
     vertical-align: middle;
   }
+
+  @media ${breakpoints.sm}{
+    width: 20%;
+    }
 `;
