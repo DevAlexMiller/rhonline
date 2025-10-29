@@ -48,7 +48,7 @@ const Grid = ({ columns, data, showAdminControls}) => {
                   setStatusMessage(`Período ${mes}/${ano} aberto com sucesso!`); 
               setTimeout(() => {
                 window.location.reload();
-              }, 100);
+              }, 600);
               } else {
                   setStatusMessage(`Erro: ${response.data.message}`);
               }
@@ -74,7 +74,7 @@ const Grid = ({ columns, data, showAdminControls}) => {
             setStatusMessage(`Período ${mes}/${ano} excluído com sucesso!`);
             setTimeout(() => {
               window.location.reload();
-            }, 100);
+            }, 600);
         } else {
             setStatusMessage(`Erro: ${response.data.message}`);
         }

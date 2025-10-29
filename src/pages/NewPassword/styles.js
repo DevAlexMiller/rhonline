@@ -56,43 +56,140 @@ export const NewPassword = styled.div`
   }
 
   .input {
-  width: 100%;
-  max-width: 40vw;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-
-  .input-group {
+    width: 100%;
+    max-width: 40vw;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    gap: 1.5rem;
 
-    label {
-      font-size: 1rem;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      text-align: left;
-      margin-left: 10vh;
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      label {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        margin-left: 10vh;
+      }
+
+      .input-field {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
-    .input-field {
+    button {
+      align-self: center;
+      width: fit-content;
+    }
+    
+    .saveButton {
+        align-self: center;
+        button {
+          width: 10vw;
+        }
+      }
+  }
+
+  @media ${breakpoints.sm}{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    overflow-y: auto;
+  
+    .user-info {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 0.5rem;
       width: 100%;
+      max-width: 60vw;
+      margin-bottom: 1rem;
+
+      img {
+        width: 12vw;
+        height: 15vh;
+      }
+
+      .labels {
+        flex: 1;
+        margin-top: auto;
+
+        p {
+          font-size: 1rem;
+          margin: 0;
+        }
+
+        hr {
+          border: none;
+          border-bottom: 0.0625rem solid #000;
+          margin: 0.25rem 0 0.75rem;
+        }
+      }
+    }
+
+    .rhLogo {
+      width: 25vw;
+      height: 25vh;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto auto auto;
+      align-items: center;
+    }
+
+    .input {
+      width: 100%;
+      max-width: 70vw;
+      margin-top: 1rem;
+      margin-bottom: 8rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      text-align: center;
+      flex-direction: column;
+      gap: 1rem;
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        label {
+          font-size: 1rem;
+          font-weight: 500;
+          margin-bottom: 0.5rem;
+          align-items: left;
+          justify-content: center;
+          text-align: left;
+          margin-left: 4vh;
+        }
+
+        .input-field {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      button {
+        align-self: center;
+        width: fit-content;
+      }
+      
+      .saveButton {
+        button {
+          width: 30vw;
+        }
+      }
     }
-  }
-
-  button {
-    align-self: center;
-    width: fit-content;
-  }
-}
-
-}
-
-@media ${breakpoints.sm}{
-    display: flex;
-    flex-direction: column;
   }
 `;

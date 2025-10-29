@@ -5,7 +5,7 @@ export const MyInput = styled.input`
   width: 100%;
   height: 100%;
   border: 0.15vw solid red;
-  border-radius: 6vw;
+  border-radius: 5vw;
   background-color: white;
   padding: 1vh 2.5vw 1vh 3.5vw;
   outline: none;
@@ -33,7 +33,6 @@ export const MyInput = styled.input`
     }
 
     @media ${breakpoints.sm}{
-    background-color: blue;
     background: ${props =>
       props.iconPath ? `url(${props.iconPath}) no-repeat 0.9vw center` : 'none'};
     background-size: 5.5vw 5.5vw;

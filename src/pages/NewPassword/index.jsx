@@ -32,7 +32,7 @@ function Password() {
         // ... (Lógica de fetchProfileDetails omitida por brevidade, mas deve estar correta)
         async function fetchProfileDetails() {
             if (!token || !employeeCode) {
-                navigate('/login');
+                navigate('/');
                 return;
             }
 
@@ -54,7 +54,7 @@ function Password() {
                 setUserName('Erro ao carregar');
                 setUserRole('Erro ao carregar');
                 if (error.response?.status === 401) {
-                    navigate('/login');
+                    navigate('/');
                 }
             }
         }
@@ -64,7 +64,47 @@ function Password() {
     
     // === LÓGICA DE TROCA DE SENHA ===
     async function handleChangePassword(e) {
-        // ... (Lógica de troca de senha omitida por brevidade, mas está correta)
+    e.preventDefault();
+    setStatusMessage('');
+    if (newPassword.length < 6) {
+        setStatusColor('red');
+        setStatusMessage('A nova senha deve ter no mínimo 6 caracteres.');
+        return;
+    }
+    if (currentPassword === newPassword) {
+        setStatusColor('red');
+        setStatusMessage('A nova senha não pode ser igual à senha atual.');
+        return;
+    }
+    if (!token || !cpf) {
+        setStatusColor('red');
+        setStatusMessage('Sessão inválida. Faça login novamente.');
+        setTimeout(() => navigate('/'), 1500);
+        return;
+    }
+    try {
+        const API_URL = 'http://10.92.11.8:3000/api/change-password';
+        const response = await axios.post(
+            API_URL,
+            {
+                cpf: cpf,
+                currentPassword: currentPassword,
+                newPassword: newPassword
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        // Sucesso
+        setStatusColor('green');
+        setStatusMessage(response.data.message || 'Senha alterada com sucesso! Você será redirecionado em 3s.');
+        setTimeout(() => {
+            localStorage.clear();
+            navigate('/');
+        }, 3000);
+    } catch (error) {
+        setStatusColor('red');
+        setStatusMessage(error.response?.data?.message || 'Erro ao alterar a senha.');
+        console.error(error);
+    }
     }
 
 
@@ -86,9 +126,9 @@ function Password() {
             <div className="user-info">
               <img src="/userBlack.svg" alt="Ícone usuário" className="userLogo" />
               <div className="labels">
-                <p>Nome: <span className="profile-value">{userName}</span></p>
+                <p><b>Nome:</b> <span className="profile-value">{userName}</span></p>
                 <hr />
-                <p>Cargo: <span className="profile-value">{userRole}</span></p>
+                <p><b>Cargo:</b> <span className="profile-value">{userRole}</span></p>
                 <hr />
               </div>
             </div>
@@ -123,8 +163,10 @@ function Password() {
                   />
                 </div>
               </div>
-
-              <Button type="submit">Salvar</Button>
+                <div className="saveButton">
+                    <Button type="submit">Salvar</Button>
+                </div>
+              
               
               {statusMessage && (
                   <p style={{ color: statusColor, marginTop: '15px', fontWeight: 'bold' }}>
