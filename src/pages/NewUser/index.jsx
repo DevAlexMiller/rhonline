@@ -115,9 +115,9 @@ function NewUser() {
                   />
               </AdmInput>
               
-              <Button type="submit">Adicionar</Button>
-
-              
+              <div className='saveButton'>
+                <Button type="submit">Adicionar</Button>
+              </div>
             </form>
           </Newuser>
         </MyUser>

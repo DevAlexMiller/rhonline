@@ -45,6 +45,13 @@ export const Newuser = styled.div`
     }
   }
 
+  .saveButton {
+    align-self: center;
+    button {
+      width: 10vw;
+    }
+  }
+
   .rhLogo {
     width: 25vw;
     height: 25vh;
@@ -89,6 +96,12 @@ export const Newuser = styled.div`
   }
 
   @media ${breakpoints.sm}{
+    .saveButton {
+        button {
+          width: 30vw;
+        }
+      }
+    
     .input {
       width: 100%;
       max-width: 80vw;

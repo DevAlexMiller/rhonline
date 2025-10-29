@@ -6,7 +6,7 @@ import breakpoints from '../../styles/breakpoints';
 export const GridContainer = styled.div`
   padding: 2vh;
   @media ${breakpoints.sm}{
-    max-width: 90%;
+    max-width: 100%;
     align-items: center;
     justify-content: center;
   }
@@ -166,7 +166,28 @@ export const RoundedTable = styled(Table)`
     vertical-align: middle;
   }
 
-  @media ${breakpoints.sm}{
-    width: 20%;
+  @media ${breakpoints.sm} {
+    th,
+    td {
+      padding: 0.4rem;
+      font-size: 0.75rem;
     }
+
+    table {
+      table-layout: fixed;
+      width: 100%;
+      word-wrap: break-word;
+    }
+
+    th {
+      white-space: normal; /* permite quebra de linha no cabeçalho */
+      line-height: 1.1; /* deixa o texto mais compacto */
+    }
+
+    td {
+      white-space: nowrap; /* mantém as células em linha */
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 `;

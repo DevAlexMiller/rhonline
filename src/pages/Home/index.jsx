@@ -31,6 +31,7 @@ function Home() {
     const [availablePeriods, setAvailablePeriods] = useState([]);
     const [loading, setLoading] = useState(true);
     const [reloadTrigger, setReloadTrigger] = useState(0); 
+    const [gerandoPDF, setGerandoPDF] = useState(false); // 👈 NOVO estado de carregamento do PDF
 
     const employeeCode = localStorage.getItem('codigoFuncionario'); 
 
@@ -55,8 +56,9 @@ function Home() {
             navigate('/');
             return;
         }
+
+        setGerandoPDF(true); // 👈 Ativa o aviso visual de geração de PDF
         
-        // 🛑 CORREÇÃO CRÍTICA: Define qual URL usar
         let routeUrl;
         if (dataType === 'thirteenth') {
             routeUrl = API_URL_THIRTEENTH;
@@ -64,7 +66,6 @@ function Home() {
             routeUrl = API_URL_PAYCHECK;
         }
         
-        // O backend do 13º espera mês 12, que é o padrão do Protheus.
         const targetMonth = dataType === 'thirteenth' ? 12 : month;
 
         try {
@@ -99,13 +100,12 @@ function Home() {
             } else {
                 alert(`Falha ao visualizar o holerite ${viewType}.`);
             }
+        } finally {
+            setGerandoPDF(false); // 👈 Desativa o aviso após o processo
         }
     }
 
 
-    /**
-     * Função para transformar os dados da API (para Holerites Mensais e 13º)
-     */
     const transformDataToGrid = (data, isThirteenth = false) => {
         return data.map(item => {
             const monthDisplay = isThirteenth ? '13º Salário' : monthNames[item.period - 1];
@@ -113,21 +113,17 @@ function Home() {
             
             const IconComponent = isThirteenth ? ThirteenthIcon : BiSolidFilePdf;
 
-            // Função helper para evitar repetição de props
             const getIconProps = (viewType) => {
                 const titleText = isThirteenth ? `${monthDisplay} ${viewType}` : `Contracheque ${viewType}`;
                 
-                // Os ícones do 13º Salário já estão definidos como imagem SVG com o tamanho correto
                 const commonProps = {
                     title: `Visualizar ${titleText}`,
                     onClick: () => handlePaycheckView(item.year, item.period, viewType, dataType),
                 };
                 
                 if (isThirteenth) {
-                    // Retorna apenas props de clique e título para o ThirteenthIcon
                     return commonProps;
                 } else {
-                    // Retorna props de estilo para o BiSolidFilePdf
                     return {
                         ...commonProps,
                         color: "#000",
@@ -137,7 +133,6 @@ function Home() {
                 }
             };
             
-
             return {
                 _year: item.year,
                 _month: item.period, 
@@ -176,20 +171,16 @@ function Home() {
             const monthlyPeriods = monthlyResponse.data.periods || [];
             let finalPeriods = [];
 
-            // Transforma e duplica os dados (para 13º Parcela)
             monthlyPeriods.forEach(item => {
                 const isNovember = item.period === 11;
                 const isDecember = item.period === 12;
                 
-                // 1. Adiciona a linha Mensal Padrão
                 finalPeriods.push(transformDataToGrid([item], false)[0]);
                 
-                // 2. Duplica se for Novembro (1ª Parcela do 13º)
                 if (isNovember) {
                      finalPeriods.push(transformDataToGrid([{ year: item.year, period: item.period }], true)[0]);
                 }
 
-                // 3. Duplica se for Dezembro (2ª Parcela do 13º)
                 if (isDecember) {
                      finalPeriods.push(transformDataToGrid([{ year: item.year, period: item.period }], true)[0]);
                 }
@@ -207,7 +198,6 @@ function Home() {
         }
     }
 
-    // Chama a função de busca quando o componente é montado ou o trigger é ativado
     useEffect(() => {
         if (employeeCode) {
             fetchAllPeriods();
@@ -243,12 +233,36 @@ function Home() {
         <MyGrid>
           <img src="/rhonlineBlack.svg" alt="Logo" onClick={navigateToHome} style={{cursor: 'pointer'}} />
           <Grid 
-          columns={columns} 
-          data={availablePeriods} 
-          showAdminControls={true}
-          onActionSuccess={handleGridReload} 
+            columns={columns} 
+            data={availablePeriods} 
+            showAdminControls={true}
+            onActionSuccess={handleGridReload} 
           />
         </MyGrid>
+
+        {/* 👇 Sobreposição enquanto o PDF é gerado */}
+        {gerandoPDF && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+              color: "#fff",
+              flexDirection: "column",
+              fontSize: "1.3em",
+            }}
+          >
+            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-white mb-4"></div>
+            Gerando PDF...
+          </div>
+        )}
       </HomePage>
     );
 }
