@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Password from './pages/NewPassword'; 
 import ResetPassword from './pages/ResetPassword';
 import NewUser from './pages/NewUser';
+import Perfil from './pages/Perfil';
 import MyStyles from './styles/globalStyles';
 import {createBrowserRouter, RouterProvider, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import { useEffect } from 'react';
@@ -74,6 +75,11 @@ const router = createBrowserRouter([
         path: "/newUser",
         // 🛑 Usa o SecurityWrapper
         element: <SecurityWrapper><NewUser /></SecurityWrapper>
+    },
+    {
+        path: "/perfil",
+        // 🛑 Usa o SecurityWrapper
+        element: <SecurityWrapper><Perfil /></SecurityWrapper>
     },
 ]);
 

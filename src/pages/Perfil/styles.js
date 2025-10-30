@@ -19,7 +19,8 @@ export const NewPassword = styled.div`
   
   .user-info {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
     width: 100%;
     max-width: 30vw;
@@ -55,46 +56,6 @@ export const NewPassword = styled.div`
     align-items: center;
   }
 
-  .input {
-    width: 100%;
-    max-width: 40vw;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-
-      label {
-        font-size: 1rem;
-        font-weight: 500;
-        text-align: left;
-        margin-left: 10vh;
-      }
-
-      .input-field {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    }
-
-    button {
-      align-self: center;
-      width: fit-content;
-    }
-    
-    .saveButton {
-        align-self: center;
-        button {
-          width: 10vw;
-        }
-      }
-  }
-
   @media ${breakpoints.sm}{
     flex: 1;
     display: flex;
@@ -111,11 +72,10 @@ export const NewPassword = styled.div`
       gap: 0.5rem;
       width: 100%;
       max-width: 60vw;
-      margin-bottom: 1rem;
-
+      margin-bottom: 15rem;
       img {
         width: 12vw;
-        height: 15vh;
+        height: 10vh;
       }
 
       .labels {
@@ -140,55 +100,8 @@ export const NewPassword = styled.div`
       height: 25vh;
       object-fit: contain;
       display: block;
-      margin: 0 auto auto auto;
+      margin: 0 auto 0 auto;
       align-items: center;
-    }
-
-    .input {
-      width: 100%;
-      max-width: 70vw;
-      margin-top: 1rem;
-      margin-bottom: 8rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      flex-direction: column;
-      gap: 1rem;
-
-      .input-group {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-
-        label {
-          font-size: 1rem;
-          font-weight: 500;
-          margin-bottom: 0.5rem;
-          align-items: left;
-          justify-content: center;
-          text-align: left;
-          margin-left: 4vh;
-        }
-
-        .input-field {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-      }
-
-      button {
-        align-self: center;
-        width: fit-content;
-      }
-      
-      .saveButton {
-        button {
-          width: 30vw;
-        }
-      }
     }
   }
 `;

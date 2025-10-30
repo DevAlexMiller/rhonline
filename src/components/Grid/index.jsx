@@ -27,8 +27,9 @@ const Grid = ({ columns, data, showAdminControls}) => {
   }, []);
 
   const token = localStorage.getItem('authToken');
-  const API_URL_CREATE = 'http://10.92.11.8:3000/api/create-payroll-month';
-  const API_URL_DELETE = 'http://10.92.11.8:3000/api/delete-payroll-month';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  const API_URL_CREATE = `${API_BASE_URL}/create-payroll-month`;
+  const API_URL_DELETE = `${API_BASE_URL}/delete-payroll-month`;
 
   // [handleOpenMonth e handleDeleteMonth Functions]
   async function handleOpenMonth() {

@@ -16,7 +16,9 @@ function Login() {
         setErrorMessage('');
         
         try {
-            const response = await axios.post('http://10.92.11.8:3000/api/login', {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            console.log(API_BASE_URL);
+            const response = await axios.post(`${API_BASE_URL}/login`, {
                 cpf: cpf,
                 senha: senha
             });

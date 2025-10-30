@@ -17,7 +17,7 @@ const InputComponent = ({ placeholder, iconPath, isPassword = false, value, onCh
         onChange={onChange}
       />
       {isPassword && (
-        <IconButton onClick={toggleVisibility} type="button">
+        <IconButton onClick={toggleVisibility} type="button" tabIndex={-1}>
           {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
         </IconButton>
       )}

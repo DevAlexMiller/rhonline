@@ -39,10 +39,10 @@ function Home() {
       "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
       "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
-
-    const API_URL_MONTHLY = 'http://10.92.11.8:3000/api/payroll/available-periods';
-    const API_URL_PAYCHECK = 'http://10.92.11.8:3000/api/payroll/paycheck';
-    const API_URL_THIRTEENTH = 'http://10.92.11.8:3000/api/payroll/thirteenth-paycheck';
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;    
+    const API_URL_MONTHLY = `${API_BASE_URL}/payroll/available-periods`;
+    const API_URL_PAYCHECK = `${API_BASE_URL}/payroll/paycheck`;
+    const API_URL_THIRTEENTH = `${API_BASE_URL}/payroll/thirteenth-paycheck`;
 
     const handleGridReload = () => {
         setReloadTrigger(prev => prev + 1);
