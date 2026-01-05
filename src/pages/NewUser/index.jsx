@@ -14,6 +14,8 @@ function NewUser() {
     const [statusColor, setStatusColor] = useState('black');
 
     const navigate = useNavigate();
+    
+    // ✅ Mantemos apenas o token para autorização da requisição
     const token = localStorage.getItem('authToken');
 
     const navigateToHome = () => {
@@ -33,7 +35,7 @@ function NewUser() {
         }
 
         // Validação básica do CPF
-        if (!cpf || cpf.length < 11) {
+        if (!cpf || cpf.replace(/\D/g, '').length < 11) {
             setStatusColor('red');
             setStatusMessage('CPF inválido ou ausente.');
             return;
@@ -43,11 +45,11 @@ function NewUser() {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const API_URL = `${API_BASE_URL}/create`;
 
-            const response = await axios.post(
+            await axios.post(
                 API_URL,
                 {
                     cpf: cpf,
-                    isAdmin: isAdmin // Envia o booleano diretamente
+                    isAdmin: isAdmin 
                 },
                 {
                     headers: {
@@ -56,10 +58,9 @@ function NewUser() {
                 }
             );
 
-            // Sucesso: O backend retorna a senha inicial (o próprio CPF)
+            // Sucesso
             setStatusColor('green');
-            const initialPassword = response.data.data.initialPassword;
-            setStatusMessage(`Usuário criado. A senha inicial é o CPF`);
+            setStatusMessage(`Usuário criado com sucesso. A senha inicial é o próprio CPF.`);
 
             // Limpar formulário
             setCpf('');
@@ -69,6 +70,8 @@ function NewUser() {
             setStatusColor('red');
             if (error.response?.status === 409) {
                 setStatusMessage('Erro: CPF já cadastrado.');
+            } else if (error.response?.status === 401 || error.response?.status === 403) {
+                setStatusMessage('Acesso negado. Apenas administradores podem criar usuários.');
             } else if (error.response) {
                 setStatusMessage(error.response.data.message || 'Falha ao criar usuário.');
             } else {
@@ -82,24 +85,28 @@ function NewUser() {
         <MyUser>
           <Sidebar />
           <Newuser>
-            <img src="/rhonlineBlack.svg" alt="RH Online" className="rhLogo" onClick={navigateToHome} style={{cursor: 'pointer'}}/>
+            <img 
+                src="/rhonlineBlack.svg" 
+                alt="RH Online" 
+                className="rhLogo" 
+                onClick={navigateToHome} 
+                style={{cursor: 'pointer'}}
+            />
             <h3>Adicionar novo usuário</h3>
             <hr />
             {statusMessage && (
-                  <p style={{ color: statusColor, marginTop: '15px', fontWeight: 'bold' }}>
+                  <p style={{ color: statusColor, marginTop: '15px', fontWeight: 'bold', textAlign: 'center' }}>
                       {statusMessage}
                   </p>
               )}
-            {/* 🛑 Formulário Principal */}
             <form className="input" onSubmit={handleCreateUser}>
               <div className="input-group">
-                  <label htmlFor="cpfInput"></label>
                   <div className="input-field">
                       <InputComponent
                           id="cpfInput"
-                          placeholder="CPF"
+                          placeholder="CPF (apenas números)"
                           iconPath="/userBlack.svg"
-                          type="text" // Tipo 'text' para input de CPF
+                          type="text"
                           isPassword={false}
                           value={cpf}
                           onChange={e => setCpf(e.target.value)}

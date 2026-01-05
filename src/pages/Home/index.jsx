@@ -1,10 +1,11 @@
 import { HomePage, MyGrid } from './styles';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import Sidebar from '../../components/SideBar';
 import Grid from '../../components/Grid';
 import { BiSolidFilePdf } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; // 🛑 Importação necessária
 
 // Componente para renderizar o ícone SVG do 13º Salário
 const ThirteenthIcon = ({ onClick, title }) => (
@@ -22,23 +23,37 @@ const ThirteenthIcon = ({ onClick, title }) => (
     />
 );
 
-const navigateToHome = () => {
-    navigate('/home');
-};
-
 function Home() {
     const navigate = useNavigate();
     const [availablePeriods, setAvailablePeriods] = useState([]);
     const [loading, setLoading] = useState(true);
     const [reloadTrigger, setReloadTrigger] = useState(0); 
-    const [gerandoPDF, setGerandoPDF] = useState(false); // 👈 NOVO estado de carregamento do PDF
+    const [gerandoPDF, setGerandoPDF] = useState(false); 
 
-    const employeeCode = localStorage.getItem('codigoFuncionario'); 
+    // 🛑 EXTRAÇÃO SEGURA: Decodifica o token para obter o código do funcionário
+    const authData = useMemo(() => {
+        const token = localStorage.getItem('authToken');
+        if (!token) return null;
+        try {
+            const decoded = jwtDecode(token);
+            return {
+                token,
+                // Certifique-se que o nome da chave aqui (codigoFuncionario) 
+                // seja o mesmo que você colocou no payload do JWT no backend
+                employeeCode: decoded.codigoFuncionario,
+                isAdmin: decoded.isAdmin
+            };
+        } catch (error) {
+            console.error("Erro ao decodificar token:", error);
+            return null;
+        }
+    }, []);
 
     const monthNames = [
       "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
       "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
+
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;    
     const API_URL_MONTHLY = `${API_BASE_URL}/payroll/available-periods`;
     const API_URL_PAYCHECK = `${API_BASE_URL}/payroll/paycheck`;
@@ -48,38 +63,35 @@ function Home() {
         setReloadTrigger(prev => prev + 1);
     };
 
+    const navigateToHome = () => {
+        navigate('/home');
+    };
 
+    /**
+     * Função para visualizar o PDF
+     */
     async function handlePaycheckView(year, month, viewType, dataType) {
-        const token = localStorage.getItem('authToken');
-        
-        if (!token || !employeeCode) {
+        if (!authData?.token || !authData?.employeeCode) {
             navigate('/');
             return;
         }
 
-        setGerandoPDF(true); // 👈 Ativa o aviso visual de geração de PDF
+        setGerandoPDF(true); 
         
-        let routeUrl;
-        if (dataType === 'thirteenth') {
-            routeUrl = API_URL_THIRTEENTH;
-        } else {
-            routeUrl = API_URL_PAYCHECK;
-        }
-        
-        const targetMonth = dataType === 'thirteenth' ? 12 : month;
+        let routeUrl = dataType === 'thirteenth' ? API_URL_THIRTEENTH : API_URL_PAYCHECK;
 
         try {
             const response = await axios.post(
                 routeUrl, 
                 {
-                    employeeCode: employeeCode,
-                    month: targetMonth, 
+                    employeeCode: authData.employeeCode, // 🛑 Usando dado do token
+                    month: month, 
                     year: year,
                     type: viewType, 
                     asPdf: 'true' 
                 },
                 {
-                    headers: { Authorization: `Bearer ${token}` },
+                    headers: { Authorization: `Bearer ${authData.token}` },
                     responseType: 'blob' 
                 }
             );
@@ -101,43 +113,48 @@ function Home() {
                 alert(`Falha ao visualizar o holerite ${viewType}.`);
             }
         } finally {
-            setGerandoPDF(false); // 👈 Desativa o aviso após o processo
+            setGerandoPDF(false); 
         }
     }
 
-
-    const transformDataToGrid = (data, isThirteenth = false) => {
+    /**
+     * Transforma os dados para o Grid
+     */
+    const transformDataToGrid = (data, isThirteenth = false, parcela = null) => {
         return data.map(item => {
-            const monthDisplay = isThirteenth ? '13º Salário' : monthNames[item.period - 1];
+            const monthDisplay = isThirteenth 
+                ? `13º Salário (${parcela}ª Parcela)` 
+                : monthNames[item.period - 1];
+            
             const dataType = isThirteenth ? 'thirteenth' : 'mensal';
             
+            let monthToQuery = item.period;
+            if (isThirteenth) {
+                monthToQuery = parcela === '1' ? 11 : 12;
+            }
+
             const IconComponent = isThirteenth ? ThirteenthIcon : BiSolidFilePdf;
 
             const getIconProps = (viewType) => {
                 const titleText = isThirteenth ? `${monthDisplay} ${viewType}` : `Contracheque ${viewType}`;
                 
-                const commonProps = {
+                const props = {
                     title: `Visualizar ${titleText}`,
-                    onClick: () => handlePaycheckView(item.year, item.period, viewType, dataType),
+                    onClick: () => handlePaycheckView(item.year, monthToQuery, viewType, dataType),
                 };
                 
-                if (isThirteenth) {
-                    return commonProps;
-                } else {
-                    return {
-                        ...commonProps,
-                        color: "#000",
-                        size: "2.2em",
-                        style: { cursor: 'pointer' }
-                    };
+                if (!isThirteenth) {
+                    props.color = "#000";
+                    props.size = "2.2em";
+                    props.style = { cursor: 'pointer' };
                 }
+                return props;
             };
             
             return {
                 _year: item.year,
-                _month: item.period, 
+                _month: monthToQuery, 
                 _dataType: dataType, 
-                
                 Ano: item.year,
                 Mês: monthDisplay,
                 Simples: (
@@ -150,12 +167,8 @@ function Home() {
         });
     };
 
-
     async function fetchAllPeriods() {
-        setLoading(true);
-        const token = localStorage.getItem('authToken');
-        
-        if (!token || !employeeCode) {
+        if (!authData?.token || !authData?.employeeCode) {
             setLoading(false);
             navigate('/');
             return;
@@ -164,8 +177,8 @@ function Home() {
         try {
             const monthlyResponse = await axios.post(
                 API_URL_MONTHLY,
-                { employeeCode: employeeCode },
-                { headers: { Authorization: `Bearer ${token}` } }
+                { employeeCode: authData.employeeCode }, // 🛑 Usando dado do token
+                { headers: { Authorization: `Bearer ${authData.token}` } }
             );
 
             const monthlyPeriods = monthlyResponse.data.periods || [];
@@ -178,11 +191,11 @@ function Home() {
                 finalPeriods.push(transformDataToGrid([item], false)[0]);
                 
                 if (isNovember) {
-                     finalPeriods.push(transformDataToGrid([{ year: item.year, period: item.period }], true)[0]);
+                     finalPeriods.push(transformDataToGrid([{ ...item }], true, '1')[0]);
                 }
 
                 if (isDecember) {
-                     finalPeriods.push(transformDataToGrid([{ year: item.year, period: item.period }], true)[0]);
+                     finalPeriods.push(transformDataToGrid([{ ...item }], true, '2')[0]);
                 }
             });
 
@@ -190,7 +203,6 @@ function Home() {
         } catch (error) {
             console.error("Erro ao buscar todos os períodos de holerite:", error);
             if (error.response?.status === 401) {
-                alert("Sessão expirada. Faça login novamente.");
                 navigate('/');
             }
         } finally {
@@ -199,13 +211,13 @@ function Home() {
     }
 
     useEffect(() => {
-        if (employeeCode) {
+        if (authData) {
             fetchAllPeriods();
         } else {
             setLoading(false);
             navigate('/');
         }
-    }, [employeeCode, reloadTrigger]); 
+    }, [authData, reloadTrigger]); 
 
     const columns = [
       { key: "Ano", label: "Ano" },
@@ -225,38 +237,33 @@ function Home() {
       );
     }
 
-    if (!employeeCode) return null;
+    // Se não houver dados de autenticação após o loading, não renderiza nada
+    if (!authData) return null;
 
     return (
       <HomePage>
         <Sidebar />
         <MyGrid>
-          <img src="/rhonlineBlack.svg" alt="Logo" onClick={navigateToHome} style={{cursor: 'pointer'}} />
+          <img 
+            src="/rhonlineBlack.svg" 
+            alt="Logo" 
+            onClick={navigateToHome} 
+            style={{cursor: 'pointer'}} 
+          />
           <Grid 
             columns={columns} 
             data={availablePeriods} 
-            showAdminControls={true}
+            showAdminControls={authData.isAdmin} // 🛑 Vem do token agora
             onActionSuccess={handleGridReload} 
           />
         </MyGrid>
 
-        {/* 👇 Sobreposição enquanto o PDF é gerado */}
         {gerandoPDF && (
           <div
             style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0, 0, 0, 0.6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 9999,
-              color: "#fff",
-              flexDirection: "column",
-              fontSize: "1.3em",
+              position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.6)", display: "flex", alignItems: "center",
+              justifyContent: "center", zIndex: 9999, color: "#fff", flexDirection: "column", fontSize: "1.3em",
             }}
           >
             <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-white mb-4"></div>

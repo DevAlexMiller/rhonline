@@ -1,27 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/SideBar";
 import { MyPassword, NewPassword } from "./styles";
 import InputComponent from "../../components/Inputs";
 import Button from "../../components/Button";
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'; // 🛑 Importação necessária
 
 function Password() {
     // === ESTADOS PARA DADOS E AUTENTICAÇÃO ===
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState(''); // *** NOVO ***
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [statusMessage, setStatusMessage] = useState(''); 
     const [statusColor, setStatusColor] = useState('black');
     
     const [userName, setUserName] = useState('Carregando...');
     const [userRole, setUserRole] = useState('Carregando...');
     
-    // Dados de autenticação do localStorage
-    const cpf = localStorage.getItem('cpf');
-    const employeeCode = localStorage.getItem('codigoFuncionario');
-    const token = localStorage.getItem('authToken');
     const navigate = useNavigate();
+
+    // 🛑 EXTRAÇÃO SEGURA DO TOKEN
+    const authData = useMemo(() => {
+        const token = localStorage.getItem('authToken');
+        if (!token) return null;
+        try {
+            const decoded = jwtDecode(token);
+            return {
+                token,
+                cpf: decoded.cpf,
+                employeeCode: decoded.codigoFuncionario
+            };
+        } catch (error) {
+            console.error("Erro ao decodificar token:", error);
+            return null;
+        }
+    }, []);
 
     // Função de navegação
     const navigateToHome = () => {
@@ -31,7 +45,7 @@ function Password() {
     // === LÓGICA DE BUSCA DO PERFIL (NOME E CARGO) ===
     useEffect(() => {
         async function fetchProfileDetails() {
-            if (!token || !employeeCode) {
+            if (!authData?.token || !authData?.employeeCode) {
                 navigate('/');
                 return;
             }
@@ -42,8 +56,8 @@ function Password() {
                 
                 const response = await axios.post(
                     API_URL,
-                    { employeeCode: employeeCode },
-                    { headers: { Authorization: `Bearer ${token}` } }
+                    { employeeCode: authData.employeeCode }, // 🛑 Usando dado do token
+                    { headers: { Authorization: `Bearer ${authData.token}` } }
                 );
 
                 const { nome, cargo } = response.data;
@@ -61,12 +75,19 @@ function Password() {
         }
         
         fetchProfileDetails();
-    }, [token, employeeCode, navigate]);
+    }, [authData, navigate]);
     
     // === LÓGICA DE TROCA DE SENHA ===
     async function handleChangePassword(e) {
         e.preventDefault();
         setStatusMessage('');
+
+        if (!authData?.cpf || !authData?.token) {
+            setStatusColor('red');
+            setStatusMessage('Sessão inválida. Faça login novamente.');
+            setTimeout(() => navigate('/'), 1500);
+            return;
+        }
 
         // === BLOCO DE VALIDAÇÃO ===
         if (newPassword.length < 6) {
@@ -79,24 +100,19 @@ function Password() {
             setStatusMessage('A nova senha não pode ser igual à senha atual.');
             return;
         }
-        if (newPassword === cpf) { // *** NOVO ***
+        if (newPassword === authData.cpf) { // 🛑 Usando CPF do token
             setStatusColor('red');
             setStatusMessage('A nova senha não pode ser igual ao CPF.');
             return;
         }
-        if (newPassword !== confirmPassword) { // *** NOVO ***
+        if (newPassword !== confirmPassword) {
             setStatusColor('red');
             setStatusMessage('As senhas não coincidem. Verifique e tente novamente.');
             return;
         }
-        if (!token || !cpf) {
-            setStatusColor('red');
-            setStatusMessage('Sessão inválida. Faça login novamente.');
-            setTimeout(() => navigate('/'), 1500);
-            return;
-        }
 
-        const isMandatoryFirstChange = (cpf === currentPassword);
+        // Verifica se a troca é obrigatória (senha atual era o CPF)
+        const isMandatoryFirstChange = (authData.cpf === currentPassword);
 
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -105,11 +121,11 @@ function Password() {
             const response = await axios.post(
                 API_URL,
                 {
-                    cpf: cpf,
+                    cpf: authData.cpf, // 🛑 Usando CPF do token
                     currentPassword: currentPassword,
                     newPassword: newPassword
                 },
-                { headers: { Authorization: `Bearer ${token}` } }
+                { headers: { Authorization: `Bearer ${authData.token}` } }
             );
 
             setStatusColor('green');
@@ -117,7 +133,7 @@ function Password() {
 
             if (isMandatoryFirstChange) {
                 setTimeout(() => {
-                    localStorage.clear();
+                    localStorage.clear(); // Limpa tudo (incluindo o token e flag de segurança)
                     navigate('/');
                 }, 3000);
             } else {
@@ -125,7 +141,7 @@ function Password() {
                     setStatusMessage('');
                     setCurrentPassword('');
                     setNewPassword('');
-                    setConfirmPassword(''); // *** NOVO ***
+                    setConfirmPassword('');
                 }, 3000);
             }
 
@@ -136,7 +152,6 @@ function Password() {
         }
     }
 
-    // === RENDERIZAÇÃO ===
     return (
         <MyPassword>
             <Sidebar />
@@ -189,7 +204,6 @@ function Password() {
                         </div>
                     </div>
 
-                    {/* *** NOVO CAMPO DE CONFIRMAÇÃO *** */}
                     <div className="input-group">
                         <label htmlFor="confirmPassword">Confirmar nova senha</label>
                         <div className="input-field">

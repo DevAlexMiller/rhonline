@@ -1,5 +1,7 @@
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
+import { createBrowserRouter, RouterProvider, Outlet, useNavigate, useLocation } from 'react-router-dom';
+
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Password from './pages/NewPassword'; 
@@ -7,80 +9,54 @@ import ResetPassword from './pages/ResetPassword';
 import NewUser from './pages/NewUser';
 import Perfil from './pages/Perfil';
 import MyStyles from './styles/globalStyles';
-import {createBrowserRouter, RouterProvider, Navigate, useLocation, useNavigate} from 'react-router-dom';
-import { useEffect } from 'react';
+import SessionTimeoutWrapper from './components/Timeout/SessionTimeoutWrapper';
 
-// 🛑 NOVO COMPONENTE: Encapsula a lógica de segurança e autenticação
-const SecurityWrapper = ({ children }) => {
+const ProtectedLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const isAuthenticated = localStorage.getItem('authToken');
-    const cpfAsPassword = localStorage.getItem('CPF_AS_PASSWORD') === 'true'; 
+    
+    // Leitura dinâmica do token a cada mudança de rota
+    const token = localStorage.getItem('authToken');
+    const cpfAsPassword = localStorage.getItem('CPF_AS_PASSWORD') === 'true';
 
     useEffect(() => {
-        const currentPath = location.pathname;
-        const authRequired = currentPath !== '/'; 
-
-        // 1. Checagem de Autenticação
-        if (authRequired && !isAuthenticated) {
-            return navigate('/');
+        // Se não houver token, expulsa para o login
+        if (!token) {
+            navigate('/', { replace: true });
+            return;
         }
-        
-        // 2. 🛑 Checagem de Senha Insegura (Forçar Troca)
-        // Redireciona para /newPassword se a senha for o CPF E não estiver já lá.
-        const isPasswordChangePage = currentPath === '/newPassword';
 
-        if (isAuthenticated && cpfAsPassword && !isPasswordChangePage) {
-            return navigate('/newPassword', { replace: true });
+        // Se houver token e forçar troca de senha
+        if (cpfAsPassword && location.pathname !== '/newPassword') {
+            navigate('/newPassword', { replace: true });
         }
-    }, [isAuthenticated, cpfAsPassword, location.pathname, navigate]);
+    }, [token, cpfAsPassword, location.pathname, navigate]);
 
-    // Bloqueia a renderização se não estiver autenticado.
-    if (!isAuthenticated) {
-        return null;
-    }
-    
-    // Se a senha for o CPF e a rota NÃO for a de troca, renderiza nada 
-    // (o useEffect acima já forçou o redirecionamento).
-    const isPasswordChangePage = location.pathname === '/newPassword';
-    if (cpfAsPassword && !isPasswordChangePage) {
-        return null; 
-    }
-    
-    // Se tudo estiver OK ou se for a tela de troca de senha, renderiza o conteúdo
-    return children;
+    // Se não houver token, não renderiza nada nas rotas filhas
+    if (!token) return null;
+
+    return (
+        <SessionTimeoutWrapper>
+            <Outlet />
+        </SessionTimeoutWrapper>
+    );
 };
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Login />,
+        element: <Login />, // Página acessível sem token
     },
     {
-        path: "/home",
-        // 🛑 Usa o SecurityWrapper
-        element: <SecurityWrapper><Home /></SecurityWrapper>,
-    },
-    {
-        path: "/newPassword",
-        // 🛑 Usa o SecurityWrapper
-        element: <SecurityWrapper><Password /></SecurityWrapper>,
-    },
-    {
-        path: "/resetPassword",
-        // 🛑 Usa o SecurityWrapper
-        element: <SecurityWrapper><ResetPassword /></SecurityWrapper>
-    },
-    {
-        path: "/newUser",
-        // 🛑 Usa o SecurityWrapper
-        element: <SecurityWrapper><NewUser /></SecurityWrapper>
-    },
-    {
-        path: "/perfil",
-        // 🛑 Usa o SecurityWrapper
-        element: <SecurityWrapper><Perfil /></SecurityWrapper>
-    },
+        element: <ProtectedLayout />, // Componente pai que protege os filhos
+        children: [
+            { path: "/home", element: <Home /> },
+            { path: "/newPassword", element: <Password /> },
+            { path: "/resetPassword", element: <ResetPassword /> },
+            { path: "/newUser", element: <NewUser /> },
+            { path: "/perfil", element: <Perfil /> },
+        ]
+    }
 ]);
 
 createRoot(document.getElementById('root')).render(

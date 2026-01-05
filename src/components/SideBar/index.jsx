@@ -1,22 +1,35 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBars, FaUserPlus, FaUser } from "react-icons/fa";
 import { TiHome } from "react-icons/ti";
 import { ImKey, ImExit } from "react-icons/im";
 import { GiHouseKeys } from "react-icons/gi";
 import { MySidebar, MenuItem, IconContainer, Label } from "./styles";
+import { jwtDecode } from "jwt-decode"; // 🛑 Importação necessária
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [cpfAsPassword, setCpfAsPassword] = useState(false);
-  const sidebarRef = useRef(null); // 👈 referência para detectar cliques fora
+  const sidebarRef = useRef(null); 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const adminFlag = localStorage.getItem("isAdmin") === "true";
-    setIsAdmin(adminFlag);
+  // 🛑 EXTRAÇÃO SEGURA DO TOKEN
+  const authData = useMemo(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return null;
+    try {
+      const decoded = jwtDecode(token);
+      return {
+        isAdmin: decoded.isAdmin // ✅ Status de admin extraído do Token
+      };
+    } catch (error) {
+      console.error("Erro ao decodificar token na Sidebar:", error);
+      return null;
+    }
+  }, []);
 
+  useEffect(() => {
+    // Flag de segurança (troca obrigatória) permanece no localStorage após o login
     const cpfAsPassFlag = localStorage.getItem("CPF_AS_PASSWORD") === "true";
     setCpfAsPassword(cpfAsPassFlag);
 
@@ -25,7 +38,7 @@ const Sidebar = () => {
     }
   }, []);
 
-  // 👇 Fecha a sidebar ao clicar fora dela
+  // Fecha a sidebar ao clicar fora dela
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -50,7 +63,7 @@ const Sidebar = () => {
       return;
     }
 
-    // 🛑 BLOQUEIO DE NAVEGAÇÃO
+    // 🛑 BLOQUEIO DE NAVEGAÇÃO (Forçar troca de senha)
     if (cpfAsPassword && index !== 2 && index !== 6) {
       alert("Você deve trocar sua senha antes de navegar para outras páginas.");
       navigate("/newPassword");
@@ -67,7 +80,7 @@ const Sidebar = () => {
     };
 
     if (index === 6) {
-      localStorage.clear();
+      localStorage.clear(); // Limpa token e flags de segurança
       navigate("/");
       return;
     }
@@ -76,13 +89,14 @@ const Sidebar = () => {
       navigate(routes[index]);
     }
 
-    setOpen(false); // 👈 Fecha sidebar após clicar em uma opção
+    setOpen(false); 
   }
 
+  // Define os itens do menu baseando-se no isAdmin decodificado do Token
   const menuItems = [
     { icon: <TiHome className="icon-home" />, label: "Início", index: 1 },
     { icon: <ImKey />, label: "Alterar senha", index: 2 },
-    ...(isAdmin
+    ...(authData?.isAdmin // 🛑 Usa dado do Token para mostrar opções de admin
       ? [
           { icon: <GiHouseKeys />, label: "Gerenciar senhas", index: 3 },
           { icon: <FaUserPlus />, label: "Novo usuário", index: 4 },
